@@ -6,6 +6,7 @@ import "firebase/auth";
 import { makeStyles } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGoogle, faFacebook } from '@fortawesome/free-brands-svg-icons'
+import {UserContext} from '../../App'
 
 
 
@@ -26,6 +27,8 @@ const useStyles = makeStyles((theme) => ({
 const Login = () => {
     const classes = useStyles();
 
+    const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+
     if(firebase.apps.length === 0) {
         firebase.initializeApp(firebaseConfig);
     }
@@ -34,9 +37,10 @@ const Login = () => {
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider)
         .then((result) => {
-            const credential = result.credential;
-            const token = credential.accessToken;
-            const user = result.user;
+            const user = result.user;   
+            const {displayName, email} = user;
+            const signedInUser = {name: displayName, email};
+            setLoggedInUser(signedInUser);
             console.log(user);
         }).catch((error) => {
             const errorCode = error.code;
